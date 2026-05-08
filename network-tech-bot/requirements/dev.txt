@@ -1,0 +1,19 @@
+-r base.txt
+
+# Development dependencies
+pytest==7.4.3
+pytest-asyncio==0.23.2
+pytest-cov==4.1.0
+httpx==0.26.0
+faker==21.0.0
+
+# Code quality
+black==23.12.1
+isort==5.13.2
+ruff==0.1.9
+mypy==1.8.0
+pre-commit==3.6.0
+
+# Debugging
+ipdb==0.13.13
+pdbpp==0.10.3
