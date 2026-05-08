@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: network-tech-bot
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://network_user:secure_password@db:5432/network_tech_db
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../logs:/app/logs
+      - ../credentials:/app/credentials:ro
+    networks:
+      - network-tech-network
+
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: network-tech-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: network_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: network_tech_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U network_user -d network_tech_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - network-tech-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  network-tech-network:
+    driver: bridge
